@@ -10,6 +10,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 def stockprice(ticker):
+
     url = "https://www.google.com/finance?q={0}"
     soup = BeautifulSoup(requests.get(url.format(quote(ticker))).text)
 
@@ -29,6 +30,13 @@ def stockprice(ticker):
 
 def on_message(msg, server):
     text = msg.get("text", "")
+
+    btc = re.findall(r"\$btc", text)
+    if btc:
+        import requests as rq
+        price = rq.get('https://api.coindesk.com/v1/bpi/currentprice.json').json()['bpi']['USD']['rate_float']
+        return '1BTC is currently worth ${price:,.2f}'.format(price=price, )
+
     matches = re.findall(r"\$[a-zA-Z]\w{0,3}", text)
     if not matches:
         return
